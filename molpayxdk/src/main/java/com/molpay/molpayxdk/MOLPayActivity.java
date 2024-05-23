@@ -36,6 +36,8 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.molpay.molpayxdk.googlepay.ActivityGP;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -102,6 +104,7 @@ public class MOLPayActivity extends AppCompatActivity {
     private final static String mptransactionresults = "mptransactionresults://";
     private final static String mprunscriptonpopup = "mprunscriptonpopup://";
     private final static String mppinstructioncapture = "mppinstructioncapture://";
+    private final static String mpclickgpbutton = "mpclickgpbutton://";
     private final static String module_id = "module_id";
     private final static String wrapper_version = "wrapper_version";
     private final static String wrapperVersion = "1";
@@ -201,6 +204,7 @@ public class MOLPayActivity extends AppCompatActivity {
             cookieManager.setAcceptThirdPartyCookies(mpMOLPayUI, true);
         }
         mpMainUI.loadUrl("https://pay.merchant.razer.com/RMS/API/xdk/");
+//        mpMainUI.loadUrl("https://apps.apis17.net/ashraf/xdkwebcore/");
 
         // Configure MOLPay ui
         mpMOLPayUI.getSettings().setCacheMode(WebSettings.LOAD_DEFAULT);
@@ -534,6 +538,26 @@ public class MOLPayActivity extends AppCompatActivity {
                     }
 
                 }
+                else if (url.startsWith(mpclickgpbutton)) {
+                    paymentDetails.put(MOLPayActivity.mp_sandbox_mode, true);
+                    paymentDetails.put(MOLPayActivity.mp_merchant_ID, "SB_molpayxdk"); // Your sandbox / production merchant ID
+                    paymentDetails.put(MOLPayActivity.mp_verification_key, "4445db44bdb60687a8e7f7903a59c3a9"); // Your sandbox / production verification key
+//                    paymentDetails.put(MOLPayActivity.mp_sandbox_mode, Objects.requireNonNull(paymentDetails.get("mp_sandbox_mode"))); // Only set to false once you have request production access for your app
+//                    paymentDetails.put(MOLPayActivity.mp_merchant_ID, Objects.requireNonNull(paymentDetails.get("mp_merchant_ID"))); // Your sandbox / production merchant ID
+//                    paymentDetails.put(MOLPayActivity.mp_verification_key, Objects.requireNonNull(paymentDetails.get("mp_verification_key"))); // Your sandbox / production verification key
+                    paymentDetails.put(MOLPayActivity.mp_amount, Objects.requireNonNull(paymentDetails.get("mp_amount"))); // Must be in 2 decimal points format
+                    paymentDetails.put(MOLPayActivity.mp_order_ID, Objects.requireNonNull(paymentDetails.get("mp_order_ID"))); // Must be unique
+                    paymentDetails.put(MOLPayActivity.mp_currency, Objects.requireNonNull(paymentDetails.get("mp_currency"))); // Must matched mp_country
+                    paymentDetails.put(MOLPayActivity.mp_country, Objects.requireNonNull(paymentDetails.get("mp_country"))); // Must matched mp_currency
+                    paymentDetails.put(MOLPayActivity.mp_bill_description, Objects.requireNonNull(paymentDetails.get("mp_bill_description")));
+                    paymentDetails.put(MOLPayActivity.mp_bill_name, Objects.requireNonNull(paymentDetails.get("mp_bill_name")));
+                    paymentDetails.put(MOLPayActivity.mp_bill_email, Objects.requireNonNull(paymentDetails.get("mp_bill_email")));
+                    paymentDetails.put(MOLPayActivity.mp_bill_mobile, Objects.requireNonNull(paymentDetails.get("mp_bill_mobile")));
+
+                    Intent intent = new Intent(MOLPayActivity.this, ActivityGP.class); // Used ActivityGP for Google Pay
+                    intent.putExtra(MOLPayActivity.MOLPayPaymentDetails, paymentDetails);
+                    startActivityForResult(intent, MOLPayActivity.MOLPayXDK);
+                }
             }
 
             return true;
@@ -553,6 +577,24 @@ public class MOLPayActivity extends AppCompatActivity {
                 mpMainUI.loadUrl("javascript:updateSdkData(" + json.toString() + ")");
 
             }
+        }
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        Log.e("logGooglePay" , "MOLPAY onActivityResult requestCode = " + requestCode);
+        Log.e("logGooglePay" , "MOLPAY onActivityResult resultCode = " + resultCode);
+
+        if (requestCode == MOLPayActivity.MOLPayXDK && resultCode == RESULT_OK){
+            Log.e("logGooglePay", "MOLPAY result = " + data.getStringExtra(MOLPayActivity.MOLPayTransactionResult));
+            Intent result = new Intent();
+            result.putExtra(MOLPayTransactionResult, data.getStringExtra(MOLPayActivity.MOLPayTransactionResult));
+            setResult(RESULT_OK, result);
+            finish();
         }
 
     }

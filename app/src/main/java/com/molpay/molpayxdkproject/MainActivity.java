@@ -27,23 +27,23 @@ public class MainActivity extends AppCompatActivity {
 
     private void restartmolpay() {
         HashMap<String, Object> paymentDetails = new HashMap<>();
-        paymentDetails.put(MOLPayActivity.mp_amount, "1.10");
+        paymentDetails.put(MOLPayActivity.mp_amount, "23.16");
 
         // TODO: Enter your merchant account credentials before test run
-        paymentDetails.put(MOLPayActivity.mp_username, "");
-        paymentDetails.put(MOLPayActivity.mp_password, "");
-        paymentDetails.put(MOLPayActivity.mp_merchant_ID, "");
-        paymentDetails.put(MOLPayActivity.mp_app_name, "");
-        paymentDetails.put(MOLPayActivity.mp_verification_key, "");
+        paymentDetails.put(MOLPayActivity.mp_username, "RMSxdk_2022");
+        paymentDetails.put(MOLPayActivity.mp_password, "RMSpwd@2022");
+        paymentDetails.put(MOLPayActivity.mp_merchant_ID, "CSSresidensirica");
+        paymentDetails.put(MOLPayActivity.mp_app_name, "csshome");
+        paymentDetails.put(MOLPayActivity.mp_verification_key, "64651af7c49bcd1370c8652808c9239d");
 
-        paymentDetails.put(MOLPayActivity.mp_order_ID, Calendar.getInstance().getTimeInMillis());
+        paymentDetails.put(MOLPayActivity.mp_order_ID, "10000457RRS01");
         paymentDetails.put(MOLPayActivity.mp_currency, "MYR");
         paymentDetails.put(MOLPayActivity.mp_country, "MY");
         paymentDetails.put(MOLPayActivity.mp_channel, "multi");
-        paymentDetails.put(MOLPayActivity.mp_bill_description, "bill description");
-        paymentDetails.put(MOLPayActivity.mp_bill_name, "bill name");
-        paymentDetails.put(MOLPayActivity.mp_bill_email, "example@gmail.com");
-        paymentDetails.put(MOLPayActivity.mp_bill_mobile, "123456789");
+        paymentDetails.put(MOLPayActivity.mp_bill_description, "Being payment for RESIDENSI RICA SENTUL - 25-2");
+        paymentDetails.put(MOLPayActivity.mp_bill_name, "NUR FATEN NADIA BINTI EDRIS");
+        paymentDetails.put(MOLPayActivity.mp_bill_email, "nadiaaa.edries@gmail.com");
+        paymentDetails.put(MOLPayActivity.mp_bill_mobile, "60102097578");
 
         // TODO: Learn more about optional parameters here https://github.com/RazerMS/Mobile-XDK-RazerMS_Android_Studio/wiki/Installation-Guidance#prepare-the-payment-detail-object
 //        paymentDetails.put(MOLPayActivity.mp_channel_editing, false);
@@ -70,8 +70,8 @@ public class MainActivity extends AppCompatActivity {
         paymentDetails.put(MOLPayActivity.mp_sandbox_mode, true); // Only set to false once you have request production access for your app
 
         // TODO: Enter your merchant account credentials before test run
-        paymentDetails.put(MOLPayActivity.mp_merchant_ID, ""); // Your sandbox / production merchant ID
-        paymentDetails.put(MOLPayActivity.mp_verification_key, ""); // Your sandbox / production verification key
+        paymentDetails.put(MOLPayActivity.mp_merchant_ID, "SB_molpayxdk"); // Your sandbox / production merchant ID
+        paymentDetails.put(MOLPayActivity.mp_verification_key, "4445db44bdb60687a8e7f7903a59c3a9"); // Your sandbox / production verification key
 
         paymentDetails.put(MOLPayActivity.mp_amount, "1.11"); // Must be in 2 decimal points format
         paymentDetails.put(MOLPayActivity.mp_order_ID, Calendar.getInstance().getTimeInMillis()); // Must be unique
