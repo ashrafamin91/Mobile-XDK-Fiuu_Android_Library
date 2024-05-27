@@ -225,6 +225,7 @@ public class WebActivity extends AppCompatActivity {
         statCodeValueSuccess = false;
 
         if (plainHtml.contains("xdkHTMLRedirection")) {
+            Log.e("logGooglePay" , "dapat xdkHTMLRedirection");
             xdkHTMLRedirection = StringUtils.substringBetween(plainHtml, "xdkHTMLRedirection' value='", "'");
             wvGateway.loadData(xdkHTMLRedirection, "text/html", "base64");
         } else {

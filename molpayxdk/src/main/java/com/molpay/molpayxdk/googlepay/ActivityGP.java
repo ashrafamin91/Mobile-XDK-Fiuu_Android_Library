@@ -278,7 +278,7 @@ public class ActivityGP extends AppCompatActivity {
                     // Response Error CallBack
                     assert data != null;
                     response = data.getStringExtra("response");
-
+                    Log.e("logGooglePay" , "RESULT_CANCELED response = " + response);
                     Toast toast2 = Toast.makeText(this, response, Toast.LENGTH_LONG);
                     toast2.show();
                     break;

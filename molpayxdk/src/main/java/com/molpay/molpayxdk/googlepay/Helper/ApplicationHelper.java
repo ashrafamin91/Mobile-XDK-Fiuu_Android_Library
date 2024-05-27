@@ -20,6 +20,7 @@ public class ApplicationHelper {
 
     public String GetVCode(String amount, String merchantID, String orderId, String verifyKey) {
         byte[] hashData = AlgorithmHelper.md5(amount + merchantID + orderId + verifyKey);
+//        byte[] hashData = AlgorithmHelper.md5(amount + merchantID + orderId + verifyKey + "MYR");
 
         return String.format("%s", UtilityHelper.ByteArrayToHexString(hashData));
     }
