@@ -32,6 +32,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Arrays;
 import java.util.Iterator;
 
 public class WebActivity extends AppCompatActivity {
@@ -57,6 +58,8 @@ public class WebActivity extends AppCompatActivity {
         Intent intent = getIntent();
         String paymentInput = intent.getStringExtra("paymentInput");
         String paymentInfo = intent.getStringExtra("paymentInfo");
+
+        Log.e("logGooglePay" , "WebActivity paymentInput = " + paymentInput);
 
         // Transcation model from paymentInput
         JSONObject paymentInputObj = null;
@@ -119,6 +122,8 @@ public class WebActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
 
+                Log.e("logGooglePay" , "onTick trasactionJsonStr = " + Arrays.toString(trasactionJsonStr));
+
                 QueryResultThread queryResultThread = new QueryResultThread();
                 queryResultThread.setValue(trasactionJsonStr[0]); // set value
 
@@ -145,7 +150,7 @@ public class WebActivity extends AppCompatActivity {
 
                             if (statCodeValue.equals("00")) {
                                 if (statCodeValueSuccess) {
-                                    Log.e("logGooglePay" , "statCodeValueSuccess setResult(RESULT_OK finish");
+                                    Log.e("logGooglePay" , "statCodeValueSuccess finish");
                                     onFinish();
                                 }
                             } else if (statCodeValue.equals("11")) {
@@ -190,13 +195,19 @@ public class WebActivity extends AppCompatActivity {
             @Override
             public void onFinish() {
                 try {
+                    Log.e("logGooglePay" , "onFinish Arrays queryResultStr = " + Arrays.toString(queryResultStr));
+
                     JSONObject queryResultObj = new JSONObject(queryResultStr[0]);
                     String responseBody = queryResultObj.getString("responseBody");
+
+                    Log.e("logGooglePay" , "onFinish responseBody = " + responseBody);
 
                     JSONObject responseBodyObj = new JSONObject(responseBody);
 
                     Intent intent = new Intent();
                     intent.putExtra("response", String.valueOf(responseBodyObj));
+
+                    Log.e("logGooglePay" , "onFinish response = " + String.valueOf(responseBodyObj));
 
                     // If timeout / cancel
                     if (!responseBodyObj.has("StatCode")){

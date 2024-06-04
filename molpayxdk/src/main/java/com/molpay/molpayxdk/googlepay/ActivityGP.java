@@ -279,8 +279,12 @@ public class ActivityGP extends AppCompatActivity {
                     assert data != null;
                     response = data.getStringExtra("response");
                     Log.e("logGooglePay" , "RESULT_CANCELED response = " + response);
-                    Toast toast2 = Toast.makeText(this, response, Toast.LENGTH_LONG);
-                    toast2.show();
+                    Intent resultCancel = new Intent();
+                    resultCancel.putExtra(MOLPayActivity.MOLPayTransactionResult, response);
+                    setResult(RESULT_CANCELED, resultCancel);
+                    finish();
+//                    Toast toast2 = Toast.makeText(this, response, Toast.LENGTH_LONG);
+//                    toast2.show();
                     break;
 
                 case AutoResolveHelper.RESULT_ERROR:

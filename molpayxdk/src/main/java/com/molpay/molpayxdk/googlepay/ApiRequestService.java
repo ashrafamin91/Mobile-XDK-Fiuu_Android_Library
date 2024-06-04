@@ -6,6 +6,7 @@ package com.molpay.molpayxdk.googlepay;
 
 import android.net.Uri;
 import android.os.Build;
+import android.util.Log;
 
 import androidx.annotation.RequiresApi;
 
@@ -90,6 +91,21 @@ public class ApiRequestService {
                     .appendQueryParameter("mpsl_version", "2")
                     .appendQueryParameter("GooglePay", GooglePayBase64);
 
+                Log.e("logGooglePay", "1 GetPaymentRequest postRequest");
+                Log.e("logGooglePay", "uri = " + uri);
+                Log.e("logGooglePay", "MerchantID = " + merchantId);
+                Log.e("logGooglePay", "ReferenceNo = " + orderId);
+                Log.e("logGooglePay", "TxnType = " + txnType);
+                Log.e("logGooglePay", "TxnCurrency = " + currency);
+                Log.e("logGooglePay", "TxnAmount = " + amount);
+                Log.e("logGooglePay", "CustName = " + billName);
+                Log.e("logGooglePay", "CustEmail = " + billEmail);
+                Log.e("logGooglePay", "CustContact = " + billPhone);
+                Log.e("logGooglePay", "CustDesc = " + billDesc);
+                Log.e("logGooglePay", "Signature = " + vCode);
+                Log.e("logGooglePay", "mpsl_version = 2");
+                Log.e("logGooglePay", "GooglePay = " + GooglePayBase64);
+
                 return postRequest(uri, builder);
         } catch (JSONException e) {
             e.printStackTrace();
@@ -107,6 +123,8 @@ public class ApiRequestService {
                 endPoint = Development.API_PAYMENT + "RMS/q_by_tid.php";
             }
 
+            Log.e("logGooglePay", "GetPaymentResult endPoint = " + endPoint);
+
             Uri uri = Uri.parse(endPoint)
                     .buildUpon()
                     .build();
@@ -123,6 +141,8 @@ public class ApiRequestService {
                     amount
             );
 
+            Log.e("logGooglePay", "sKey = " + sKey);
+
             Uri.Builder builder = new Uri.Builder()
                     .appendQueryParameter("amount", amount)
                     .appendQueryParameter("txID", txID)
@@ -130,6 +150,16 @@ public class ApiRequestService {
                     .appendQueryParameter("skey", sKey)
                     .appendQueryParameter("url", "")
                     .appendQueryParameter("type", "2");
+
+            Log.e("logGooglePay", "2 GetPaymentResult postRequest");
+
+            Log.e("logGooglePay", "GetPaymentResult uri = " + uri);
+            Log.e("logGooglePay", "GetPaymentResult amount = " + amount);
+            Log.e("logGooglePay", "GetPaymentResult txID = " + txID);
+            Log.e("logGooglePay", "GetPaymentResult domain = " + merchantId);
+            Log.e("logGooglePay", "GetPaymentResult skey = " + sKey);
+            Log.e("logGooglePay", "GetPaymentResult url = ");
+            Log.e("logGooglePay", "GetPaymentResult type = 2");
 
             return postRequest(uri, builder);
         } catch (JSONException e) {
@@ -183,6 +213,8 @@ public class ApiRequestService {
             response.put("statusCode", httpURLConnection.getResponseCode());
             response.put("responseMessage", httpURLConnection.getResponseMessage());
             response.put("responseBody", getResponseBody(httpURLConnection));
+
+            Log.e("logGooglePay", "JSONObject parse response = " + response.toString());
 
             return response;
         } catch (Exception e) {
