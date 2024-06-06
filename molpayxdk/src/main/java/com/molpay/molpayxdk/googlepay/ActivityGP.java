@@ -197,26 +197,22 @@ public class ActivityGP extends AppCompatActivity {
 
         if (paymentDetails != null) {
             try {
-                // TODO: Send the payment info e.g. (all info are compulsory) :
+                // Extended VCode setting
+                if (paymentDetails.get("mp_extended_vcode") == null) {
+                    paymentInput.put("extendedVCode", false);
+                } else {
+                    paymentInput.put("extendedVCode", Objects.requireNonNull(paymentDetails.get("mp_extended_vcode")));
+                }
+
                 paymentInput.put("orderId", Objects.requireNonNull(paymentDetails.get("mp_order_ID")).toString()); // Unique payment order id
                 paymentInput.put("amount", Objects.requireNonNull(paymentDetails.get("mp_amount")).toString()); // Payment amount
                 paymentInput.put("currency", CURRENCY_CODE); // Payment currency
-                paymentInput.put("extendedVCode", Objects.requireNonNull(paymentDetails.get("mp_extended_vcode"))); // Extended VCode setting
                 paymentInput.put("billName", Objects.requireNonNull(paymentDetails.get("mp_bill_name")).toString()); // Payer name
                 paymentInput.put("billEmail", Objects.requireNonNull(paymentDetails.get("mp_bill_email")).toString()); // Payer email
                 paymentInput.put("billPhone", Objects.requireNonNull(paymentDetails.get("mp_bill_mobile")).toString()); // Payer phone
                 paymentInput.put("billDesc", Objects.requireNonNull(paymentDetails.get("mp_bill_description")).toString()); // Payment description
                 paymentInput.put("merchantId", Objects.requireNonNull(paymentDetails.get("mp_merchant_ID")).toString()); // Your registered merchantId
                 paymentInput.put("verificationKey", Objects.requireNonNull(paymentDetails.get("mp_verification_key")).toString()); // Your registered verificationKey
-
-            /*
-            TODO: Follow Google’s instructions to request production access for your app: https://developers.google.com/pay/api/android/guides/test-and-deploy/request-prod-access
-            *
-             Choose the integration type Gateway when prompted, and provide screenshots of your app for review.
-             After your app has been approved, test your integration in production by setting the environment to GooglePayEnvironment.Production
-             Then launching Google Pay from a signed, release build of your app.
-             Remember to use your live mode verificationKey & merchantId. Set isSandbox = false for production environment.
-             */
                 paymentInput.put("isSandbox", Objects.requireNonNull(paymentDetails.get("mp_sandbox_mode")).toString()); // True = Testing ; False = Production
 
                 JSONObject paymentInputObj = paymentInput;

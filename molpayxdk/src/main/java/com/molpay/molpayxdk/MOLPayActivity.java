@@ -540,6 +540,14 @@ public class MOLPayActivity extends AppCompatActivity {
 
                 }
                 else if (url.startsWith(mpclickgpbutton)) {
+
+                    // Extended VCode setting
+                    if (paymentDetails.get("mp_extended_vcode") == null) {
+                        paymentDetails.put(MOLPayActivity.mp_extended_vcode, false);
+                    } else {
+                        paymentDetails.put(MOLPayActivity.mp_extended_vcode, Objects.requireNonNull(paymentDetails.get("mp_extended_vcode")));
+                    }
+
                     paymentDetails.put(MOLPayActivity.mp_sandbox_mode, true);
                     paymentDetails.put(MOLPayActivity.mp_merchant_ID, "SB_molpayxdk"); // Your sandbox / production merchant ID
                     paymentDetails.put(MOLPayActivity.mp_verification_key, "4445db44bdb60687a8e7f7903a59c3a9"); // Your sandbox / production verification key
@@ -554,7 +562,6 @@ public class MOLPayActivity extends AppCompatActivity {
                     paymentDetails.put(MOLPayActivity.mp_bill_name, Objects.requireNonNull(paymentDetails.get("mp_bill_name")));
                     paymentDetails.put(MOLPayActivity.mp_bill_email, Objects.requireNonNull(paymentDetails.get("mp_bill_email")));
                     paymentDetails.put(MOLPayActivity.mp_bill_mobile, Objects.requireNonNull(paymentDetails.get("mp_bill_mobile")));
-                    paymentDetails.put(MOLPayActivity.mp_extended_vcode, Objects.requireNonNull(paymentDetails.get("mp_extended_vcode")));
 
                     Intent intent = new Intent(MOLPayActivity.this, ActivityGP.class); // Used ActivityGP for Google Pay
                     intent.putExtra(MOLPayActivity.MOLPayPaymentDetails, paymentDetails);

@@ -45,9 +45,8 @@ public class MainActivity extends AppCompatActivity {
         paymentDetails.put(MOLPayActivity.mp_bill_email, "example@gmail.com");
         paymentDetails.put(MOLPayActivity.mp_bill_mobile, "123456789");
 
-        paymentDetails.put(MOLPayActivity.mp_extended_vcode, false); // For Google Pay Only - Returned true if your account enabled extended Verify Payment
-
         // TODO: Learn more about optional parameters here https://github.com/RazerMS/Mobile-XDK-RazerMS_Android_Studio/wiki/Installation-Guidance#prepare-the-payment-detail-object
+//        paymentDetails.put(MOLPayActivity.mp_extended_vcode, false); // For Google Pay Only - Set true if your account enabled extended Verify Payment
 //        paymentDetails.put(MOLPayActivity.mp_channel_editing, false);
 //        paymentDetails.put(MOLPayActivity.mp_editing_enabled, true);
 //        paymentDetails.put(MOLPayActivity.mp_express_mode, false);
@@ -86,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
         paymentDetails.put(MOLPayActivity.mp_bill_email, "payer.email@fiuu.com");
         paymentDetails.put(MOLPayActivity.mp_bill_mobile, "123456789");
 
-        paymentDetails.put(MOLPayActivity.mp_extended_vcode, true); // Set true if your account enabled extended Verify Payment
+        paymentDetails.put(MOLPayActivity.mp_extended_vcode, false); // Optional : Set true if your account enabled extended Verify Payment
 
         Intent intent = new Intent(MainActivity.this, ActivityGP.class); // Used ActivityGP for Google Pay
         intent.putExtra(MOLPayActivity.MOLPayPaymentDetails, paymentDetails);
