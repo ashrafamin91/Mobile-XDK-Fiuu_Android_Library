@@ -43,12 +43,15 @@ public class ApiRequestService {
     @RequiresApi(api = Build.VERSION_CODES.O)
     public Object GetPaymentRequest(JSONObject paymentInput, String paymentInfo ) {
 
+        Log.e("logGooglePay", "GetPaymentRequest paymentInfo = " + paymentInfo);
+
         try {
             String endPoint = "";
             String txnType = "SALS";
             String orderId = paymentInput.getString("orderId");
             String amount = paymentInput.getString("amount");
             String currency = paymentInput.getString("currency");
+            boolean extendedVCode = paymentInput.getBoolean("extendedVCode");
             String billName = paymentInput.getString("billName");
             String billEmail = paymentInput.getString("billEmail");
             String billPhone = paymentInput.getString("billPhone");
@@ -71,7 +74,9 @@ public class ApiRequestService {
                 amount,
                 merchantId,
                 orderId,
-                verificationKey
+                verificationKey,
+                currency,
+                extendedVCode
             );
 
             String GooglePayBase64 = Base64.getEncoder()

@@ -58,6 +58,7 @@ public class MOLPayActivity extends AppCompatActivity {
     public final static String mp_merchant_ID = "mp_merchant_ID";
     public final static String mp_app_name = "mp_app_name";
     public final static String mp_order_ID = "mp_order_ID";
+    public final static String mp_extended_vcode = "mp_extended_vcode";
     public final static String mp_currency = "mp_currency";
     public final static String mp_country = "mp_country";
     public final static String mp_verification_key = "mp_verification_key";
@@ -553,6 +554,7 @@ public class MOLPayActivity extends AppCompatActivity {
                     paymentDetails.put(MOLPayActivity.mp_bill_name, Objects.requireNonNull(paymentDetails.get("mp_bill_name")));
                     paymentDetails.put(MOLPayActivity.mp_bill_email, Objects.requireNonNull(paymentDetails.get("mp_bill_email")));
                     paymentDetails.put(MOLPayActivity.mp_bill_mobile, Objects.requireNonNull(paymentDetails.get("mp_bill_mobile")));
+                    paymentDetails.put(MOLPayActivity.mp_extended_vcode, Objects.requireNonNull(paymentDetails.get("mp_extended_vcode")));
 
                     Intent intent = new Intent(MOLPayActivity.this, ActivityGP.class); // Used ActivityGP for Google Pay
                     intent.putExtra(MOLPayActivity.MOLPayPaymentDetails, paymentDetails);

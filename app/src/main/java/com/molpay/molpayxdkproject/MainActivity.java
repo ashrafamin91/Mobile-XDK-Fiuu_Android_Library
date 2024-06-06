@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void restartmolpay() {
         HashMap<String, Object> paymentDetails = new HashMap<>();
-        paymentDetails.put(MOLPayActivity.mp_amount, "1.01");
+        paymentDetails.put(MOLPayActivity.mp_amount, "1.10");
 
         // TODO: Enter your merchant account credentials before test run
         paymentDetails.put(MOLPayActivity.mp_username, "RMSxdk_2022");
@@ -36,14 +36,16 @@ public class MainActivity extends AppCompatActivity {
         paymentDetails.put(MOLPayActivity.mp_app_name, "mobile");
         paymentDetails.put(MOLPayActivity.mp_verification_key, "ee738b541eff7b6b495e44771f71c0ec");
 
-        paymentDetails.put(MOLPayActivity.mp_order_ID, "10000457RRS01");
-        paymentDetails.put(MOLPayActivity.mp_currency, "SGD");
-        paymentDetails.put(MOLPayActivity.mp_country, "SG");
+        paymentDetails.put(MOLPayActivity.mp_order_ID, Calendar.getInstance().getTimeInMillis());
+        paymentDetails.put(MOLPayActivity.mp_currency, "MYR");
+        paymentDetails.put(MOLPayActivity.mp_country, "MY");
         paymentDetails.put(MOLPayActivity.mp_channel, "multi");
-        paymentDetails.put(MOLPayActivity.mp_bill_description, "Being payment for RESIDENSI RICA SENTUL - 25-2");
-        paymentDetails.put(MOLPayActivity.mp_bill_name, "NUR FATEN NADIA BINTI EDRIS");
-        paymentDetails.put(MOLPayActivity.mp_bill_email, "nadiaaa.edries@gmail.com");
-        paymentDetails.put(MOLPayActivity.mp_bill_mobile, "60102097578");
+        paymentDetails.put(MOLPayActivity.mp_bill_description, "bill description");
+        paymentDetails.put(MOLPayActivity.mp_bill_name, "bill name");
+        paymentDetails.put(MOLPayActivity.mp_bill_email, "example@gmail.com");
+        paymentDetails.put(MOLPayActivity.mp_bill_mobile, "123456789");
+
+        paymentDetails.put(MOLPayActivity.mp_extended_vcode, false); // For Google Pay Only
 
         // TODO: Learn more about optional parameters here https://github.com/RazerMS/Mobile-XDK-RazerMS_Android_Studio/wiki/Installation-Guidance#prepare-the-payment-detail-object
 //        paymentDetails.put(MOLPayActivity.mp_channel_editing, false);
@@ -72,9 +74,12 @@ public class MainActivity extends AppCompatActivity {
         // TODO: Enter your merchant account credentials before test run
         paymentDetails.put(MOLPayActivity.mp_merchant_ID, "SB_molpayxdk"); // Your sandbox / production merchant ID
         paymentDetails.put(MOLPayActivity.mp_verification_key, "4445db44bdb60687a8e7f7903a59c3a9"); // Your sandbox / production verification key
+//        paymentDetails.put(MOLPayActivity.mp_merchant_ID, "zeoniq01_Dev"); // Your sandbox / production merchant ID
+//        paymentDetails.put(MOLPayActivity.mp_verification_key, "c222730a6a3b32f0b3193fec830eec3b"); // Your sandbox / production verification key
 
-        paymentDetails.put(MOLPayActivity.mp_amount, "0.50"); // Must be in 2 decimal points format. Minimum 1.00
+        paymentDetails.put(MOLPayActivity.mp_amount, "1.11"); // Must be in 2 decimal points format
         paymentDetails.put(MOLPayActivity.mp_order_ID, Calendar.getInstance().getTimeInMillis()); // Must be unique
+        paymentDetails.put(MOLPayActivity.mp_extended_vcode, true); // Must matched mp_country
         paymentDetails.put(MOLPayActivity.mp_currency, "MYR"); // Must matched mp_country
         paymentDetails.put(MOLPayActivity.mp_country, "MY"); // Must matched mp_currency
         paymentDetails.put(MOLPayActivity.mp_bill_description, "The bill description");
@@ -95,11 +100,12 @@ public class MainActivity extends AppCompatActivity {
         Log.e("logGooglePay" , "onActivityResult requestCode = " + requestCode);
         Log.e("logGooglePay" , "onActivityResult resultCode = " + resultCode);
 
-//        if (requestCode == MOLPayActivity.MOLPayXDK && resultCode == RESULT_OK){
-        if (requestCode == MOLPayActivity.MOLPayXDK){
-            Log.d(MOLPayActivity.MOLPAY, "MOLPay result = "+data.getStringExtra(MOLPayActivity.MOLPayTransactionResult));
-            TextView tw = (TextView)findViewById(R.id.resultTV);
-            tw.setText(data.getStringExtra(MOLPayActivity.MOLPayTransactionResult));
+        if (requestCode == MOLPayActivity.MOLPayXDK && data != null){
+            if (data.getStringExtra(MOLPayActivity.MOLPayTransactionResult) != null) {
+                Log.d(MOLPayActivity.MOLPAY, "MOLPay result = " + data.getStringExtra(MOLPayActivity.MOLPayTransactionResult));
+                TextView tw = findViewById(R.id.resultTV);
+                tw.setText(data.getStringExtra(MOLPayActivity.MOLPayTransactionResult));
+            }
         }
 
     }

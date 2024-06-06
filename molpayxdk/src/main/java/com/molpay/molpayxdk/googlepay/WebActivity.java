@@ -248,6 +248,8 @@ public class WebActivity extends AppCompatActivity {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
 
+                Log.e("logGooglePay" , "shouldOverrideUrlLoading request.getUrl = " + request.getUrl().toString());
+
                 if (request.getUrl().toString().contains("result.php")) {
                     statCodeValueSuccess = true;
                 }

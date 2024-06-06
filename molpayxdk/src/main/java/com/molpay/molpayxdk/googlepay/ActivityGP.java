@@ -78,6 +78,12 @@ public class ActivityGP extends AppCompatActivity {
                         // The user cancelled the payment attempt
                         finish();
                         break;
+
+                    default:
+                        // If Result = 1 finish with no response
+                        setResult(RESULT_FIRST_USER, null);
+                        finish();
+                        break;
                 }
             });
 
@@ -195,6 +201,7 @@ public class ActivityGP extends AppCompatActivity {
                 paymentInput.put("orderId", Objects.requireNonNull(paymentDetails.get("mp_order_ID")).toString()); // Unique payment order id
                 paymentInput.put("amount", Objects.requireNonNull(paymentDetails.get("mp_amount")).toString()); // Payment amount
                 paymentInput.put("currency", CURRENCY_CODE); // Payment currency
+                paymentInput.put("extendedVCode", Objects.requireNonNull(paymentDetails.get("mp_extended_vcode"))); // Extended VCode setting
                 paymentInput.put("billName", Objects.requireNonNull(paymentDetails.get("mp_bill_name")).toString()); // Payer name
                 paymentInput.put("billEmail", Objects.requireNonNull(paymentDetails.get("mp_bill_email")).toString()); // Payer email
                 paymentInput.put("billPhone", Objects.requireNonNull(paymentDetails.get("mp_bill_mobile")).toString()); // Payer phone
@@ -283,8 +290,6 @@ public class ActivityGP extends AppCompatActivity {
                     resultCancel.putExtra(MOLPayActivity.MOLPayTransactionResult, response);
                     setResult(RESULT_CANCELED, resultCancel);
                     finish();
-//                    Toast toast2 = Toast.makeText(this, response, Toast.LENGTH_LONG);
-//                    toast2.show();
                     break;
 
                 case AutoResolveHelper.RESULT_ERROR:
