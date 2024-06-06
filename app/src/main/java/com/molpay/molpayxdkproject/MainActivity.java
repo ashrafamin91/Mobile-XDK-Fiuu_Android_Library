@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
         paymentDetails.put(MOLPayActivity.mp_bill_email, "example@gmail.com");
         paymentDetails.put(MOLPayActivity.mp_bill_mobile, "123456789");
 
-        paymentDetails.put(MOLPayActivity.mp_extended_vcode, false); // For Google Pay Only
+        paymentDetails.put(MOLPayActivity.mp_extended_vcode, false); // For Google Pay Only - Returned true if your account enabled extended Verify Payment
 
         // TODO: Learn more about optional parameters here https://github.com/RazerMS/Mobile-XDK-RazerMS_Android_Studio/wiki/Installation-Guidance#prepare-the-payment-detail-object
 //        paymentDetails.put(MOLPayActivity.mp_channel_editing, false);
@@ -79,13 +79,14 @@ public class MainActivity extends AppCompatActivity {
 
         paymentDetails.put(MOLPayActivity.mp_amount, "1.11"); // Must be in 2 decimal points format
         paymentDetails.put(MOLPayActivity.mp_order_ID, Calendar.getInstance().getTimeInMillis()); // Must be unique
-        paymentDetails.put(MOLPayActivity.mp_extended_vcode, true); // Must matched mp_country
         paymentDetails.put(MOLPayActivity.mp_currency, "MYR"); // Must matched mp_country
         paymentDetails.put(MOLPayActivity.mp_country, "MY"); // Must matched mp_currency
         paymentDetails.put(MOLPayActivity.mp_bill_description, "The bill description");
         paymentDetails.put(MOLPayActivity.mp_bill_name, "The bill name");
         paymentDetails.put(MOLPayActivity.mp_bill_email, "payer.email@fiuu.com");
         paymentDetails.put(MOLPayActivity.mp_bill_mobile, "123456789");
+
+        paymentDetails.put(MOLPayActivity.mp_extended_vcode, true); // Returned true if your account enabled extended Verify Payment
 
         Intent intent = new Intent(MainActivity.this, ActivityGP.class); // Used ActivityGP for Google Pay
         intent.putExtra(MOLPayActivity.MOLPayPaymentDetails, paymentDetails);
