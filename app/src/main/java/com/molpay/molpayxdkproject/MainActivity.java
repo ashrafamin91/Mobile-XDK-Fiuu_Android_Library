@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
         paymentDetails.put(MOLPayActivity.mp_bill_email, "payer.email@fiuu.com");
         paymentDetails.put(MOLPayActivity.mp_bill_mobile, "123456789");
 
-        paymentDetails.put(MOLPayActivity.mp_extended_vcode, true); // Returned true if your account enabled extended Verify Payment
+        paymentDetails.put(MOLPayActivity.mp_extended_vcode, true); // Set true if your account enabled extended Verify Payment
 
         Intent intent = new Intent(MainActivity.this, ActivityGP.class); // Used ActivityGP for Google Pay
         intent.putExtra(MOLPayActivity.MOLPayPaymentDetails, paymentDetails);
