@@ -21,6 +21,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatTextView;
@@ -79,6 +80,9 @@ public class WebActivity extends AppCompatActivity {
         wvGateway.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
         wvGateway.getSettings().setSupportMultipleWindows(true);
 
+        Log.e("logGooglePay" , "WebActivity paymentInput = " + paymentInput);
+        Log.e("logGooglePay" , "WebActivity paymentInfo = " + paymentInfo);
+
         PaymentThread paymentThread = new PaymentThread();
         paymentThread.setValue(paymentInput, paymentInfo); // set value
         Thread thread = new Thread(paymentThread);
@@ -92,6 +96,16 @@ public class WebActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+        // Register a callback for handling the back press
+        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                // Do nothing - prevent user from performing backpress
+            }
+        };
+
+        // Add the callback to the OnBackPressedDispatcher
+        getOnBackPressedDispatcher().addCallback(this, callback);
     }
 
     private void onStartTimOut() {
@@ -142,6 +156,7 @@ public class WebActivity extends AppCompatActivity {
                             intent.putExtra("response", String.valueOf(responseBodyObj));
 
                             Log.e("logGooglePay" , "statCodeValue " + statCodeValue);
+                            Log.e("logGooglePay" , "responseBodyObj = " + String.valueOf(responseBodyObj));
 
                             if (statCodeValue.equals("00")) {
                                 if (statCodeValueSuccess) {
@@ -237,6 +252,8 @@ public class WebActivity extends AppCompatActivity {
         wvGateway.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+
+                Log.e("logGooglePay" , "shouldOverrideUrlLoading getUrl = " + request.getUrl().toString());
 
                 if (request.getUrl().toString().contains("result.php")) {
                     statCodeValueSuccess = true;
@@ -395,4 +412,10 @@ public class WebActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        setResult(RESULT_CANCELED);
+        finish();
+    }
 }

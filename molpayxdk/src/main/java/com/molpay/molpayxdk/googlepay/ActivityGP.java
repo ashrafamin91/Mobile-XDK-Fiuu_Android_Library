@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.IntentSenderRequest;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -115,6 +116,17 @@ public class ActivityGP extends AppCompatActivity {
         // Check Google Pay availability
         model = new ViewModelProvider(this).get(ViewModelGP.class);
         model.canUseGooglePay.observe(this, this::setGooglePayAvailable);
+
+        // Register a callback for handling the back press
+        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                // Do nothing - prevent user from performing backpress
+            }
+        };
+
+        // Add the callback to the OnBackPressedDispatcher
+        getOnBackPressedDispatcher().addCallback(this, callback);
     }
 
     private void initializeUi() {
@@ -212,8 +224,11 @@ public class ActivityGP extends AppCompatActivity {
                 paymentInput.put("billEmail", Objects.requireNonNull(paymentDetails.get("mp_bill_email")).toString()); // Payer email
                 paymentInput.put("billPhone", Objects.requireNonNull(paymentDetails.get("mp_bill_mobile")).toString()); // Payer phone
                 paymentInput.put("billDesc", Objects.requireNonNull(paymentDetails.get("mp_bill_description")).toString()); // Payment description
+
                 paymentInput.put("merchantId", Objects.requireNonNull(paymentDetails.get("mp_merchant_ID")).toString()); // Your registered merchantId
                 paymentInput.put("verificationKey", Objects.requireNonNull(paymentDetails.get("mp_verification_key")).toString()); // Your registered verificationKey
+//                paymentInput.put("merchantId", "sq01_Dev"); // Your registered merchantId
+//                paymentInput.put("verificationKey", "2222f0a9e297a7046fd0eef58c0b833a"); // Your registered verificationKey
 
             /*
             TODO: Follow Google’s instructions to request production access for your app: https://developers.google.com/pay/api/android/guides/test-and-deploy/request-prod-access
@@ -224,10 +239,13 @@ public class ActivityGP extends AppCompatActivity {
              Remember to use your live mode verificationKey & merchantId. Set isSandbox = false for production environment.
              */
                 paymentInput.put("isSandbox", Objects.requireNonNull(paymentDetails.get("mp_sandbox_mode")).toString()); // True = Testing ; False = Production
+//                paymentInput.put("isSandbox", false); // True = Testing ; False = Production
 
                 JSONObject paymentInputObj = paymentInput;
 
                 String paymentInput = paymentInputObj.toString();
+
+                Log.e("logGooglePay" , "paymentInput = " + paymentInput);
 
                 runOnUiThread(() -> {
                     Intent i = new Intent(ActivityGP.this, WebActivity.class); // Redirect To WebActivity (RMS library)
