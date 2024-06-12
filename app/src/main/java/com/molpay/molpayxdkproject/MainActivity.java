@@ -32,9 +32,9 @@ public class MainActivity extends AppCompatActivity {
         // TODO: Enter your merchant account credentials before test run
         paymentDetails.put(MOLPayActivity.mp_username, "RMSxdk_2022");
         paymentDetails.put(MOLPayActivity.mp_password, "RMSpwd@2022");
-        paymentDetails.put(MOLPayActivity.mp_merchant_ID, "rmsxdk_mobile_Dev");
-        paymentDetails.put(MOLPayActivity.mp_app_name, "mobile");
-        paymentDetails.put(MOLPayActivity.mp_verification_key, "ee738b541eff7b6b495e44771f71c0ec");
+        paymentDetails.put(MOLPayActivity.mp_merchant_ID, "apis17_Dev");
+        paymentDetails.put(MOLPayActivity.mp_app_name, "tester_app");
+        paymentDetails.put(MOLPayActivity.mp_verification_key, "c6c619c61325987c429838d69145d7da");
 
         paymentDetails.put(MOLPayActivity.mp_order_ID, Calendar.getInstance().getTimeInMillis());
         paymentDetails.put(MOLPayActivity.mp_currency, "MYR");

@@ -47,6 +47,8 @@ public class WebActivity extends AppCompatActivity {
     public static String isSandbox;
 
     private CountDownTimer countDownTimer;
+    private String requestType = "";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,6 +83,12 @@ public class WebActivity extends AppCompatActivity {
         wvGateway.getSettings().setAllowUniversalAccessFromFileURLs(true);
         wvGateway.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
         wvGateway.getSettings().setSupportMultipleWindows(true);
+
+        wvGateway.getSettings().setLoadWithOverviewMode(true);
+        wvGateway.getSettings().setUseWideViewPort(true);
+        wvGateway.getSettings().setSupportZoom(true);
+        wvGateway.getSettings().setBuiltInZoomControls(true);
+        wvGateway.getSettings().setDisplayZoomControls(false);
 
         PaymentThread paymentThread = new PaymentThread();
         paymentThread.setValue(paymentInput, paymentInfo); // set value
@@ -235,14 +243,28 @@ public class WebActivity extends AppCompatActivity {
         tvLoading.setVisibility(View.VISIBLE);
         statCodeValueSuccess = false;
 
+        String encodedHtml = Base64.encodeToString(plainHtml.getBytes(), Base64.NO_PADDING);
+
+        Log.e("logGooglePay" , "onLoadHtmlWebView encodedHtml = " + encodedHtml);
+        Log.e("logGooglePay" , "onLoadHtmlWebView requestType = " + requestType);
+
         if (plainHtml.contains("xdkHTMLRedirection")) {
             Log.e("logGooglePay" , "dapat xdkHTMLRedirection");
             xdkHTMLRedirection = StringUtils.substringBetween(plainHtml, "xdkHTMLRedirection' value='", "'");
             wvGateway.loadData(xdkHTMLRedirection, "text/html", "base64");
+        } else if (requestType.equalsIgnoreCase("REDIRECT")) {
+            Log.e("logGooglePay" , "masuk requestType = " + requestType);
+            wvGateway.loadData(encodedHtml, "text/html", "base64");
+            pbLoading.setVisibility(View.GONE);
+            tvLoading.setVisibility(View.GONE);
+            wvGateway.setVisibility(View.VISIBLE);
+            Log.e("logGooglePay" , "lepas loadDataWithBaseURL");
         } else {
-            String encodedHtml = Base64.encodeToString(plainHtml.getBytes(), Base64.NO_PADDING);
+            Log.e("logGooglePay" , "encodedHtml = " + encodedHtml);
             wvGateway.loadData(encodedHtml, "text/html", "base64");
         }
+
+        Log.e("logGooglePay" , "lepas return");
 
         wvGateway.setWebViewClient(new WebViewClient() {
             @Override
@@ -252,6 +274,9 @@ public class WebActivity extends AppCompatActivity {
 
                 if (request.getUrl().toString().contains("result.php")) {
                     statCodeValueSuccess = true;
+                    pbLoading.setVisibility(View.VISIBLE);
+                    tvLoading.setVisibility(View.VISIBLE);
+                    wvGateway.setVisibility(View.GONE);
                 }
 
                 return super.shouldOverrideUrlLoading(view, request);
@@ -259,21 +284,26 @@ public class WebActivity extends AppCompatActivity {
 
             @Override
             public void onPageFinished(WebView view, String url) {
+                Log.e("logGooglePay" , "onPageFinished url = " + url);
+//                view.scrollTo(0, view.getContentHeight());
                 super.onPageFinished(view, url);
             }
 
             @Override
             public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
+                Log.e("logGooglePay" , "onReceivedError request.getUrl = " + request.getUrl().toString());
                 super.onReceivedError(view, request, error);
             }
 
             @Override
             public void onReceivedHttpError(WebView view, WebResourceRequest request, WebResourceResponse errorResponse) {
+                Log.e("logGooglePay" , "onReceivedHttpError request.getUrl = " + request.getUrl().toString());
                 super.onReceivedHttpError(view, request, errorResponse);
             }
 
             @Override
             public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
+                Log.e("logGooglePay" , "onReceivedSslError error.getUrl = " + error.getUrl());
                 super.onReceivedSslError(view, handler, error);
             }
         });
@@ -281,7 +311,11 @@ public class WebActivity extends AppCompatActivity {
 
     public void onRequestData(JSONObject response) {
 
+        Log.e("logGooglePay" , "onRequestData response = " + response.toString());
+
         try {
+            Log.e("logGooglePay" , "try");
+
             if (response.has("error_code") && response.has("error_desc")) {
                 Intent intent = new Intent();
                 String strResponse = response.toString();
@@ -300,6 +334,8 @@ public class WebActivity extends AppCompatActivity {
 
                 if (response.has("TxnData") && !response.has("pInstruction")) {
 
+                    Log.e("logGooglePay" , "TxnData && !pInstruction");
+
                     onStartTimOut();
 
                     JSONObject txnData = response.getJSONObject("TxnData");
@@ -312,19 +348,33 @@ public class WebActivity extends AppCompatActivity {
                     if (txnData.has("AppDeepLinkURL")) {
 //                        AppData.getInstance().setRedirectAppUrl(txnData.getString("AppDeepLinkURL"));
                     }
+                    if (txnData.has("RequestType")) {
+                        Log.e("logGooglePay" , "ada RequestType");
+                        requestType = txnData.getString("RequestType");
+                    } else {
+                        Log.e("logGooglePay" , "no RequestType");
+                    }
                     if (txnData.has("RequestData")) {
 
+                        Log.e("logGooglePay" , "has RequestData");
+
                         if (txnData.get("RequestData") instanceof JSONObject) {
+                            Log.e("logGooglePay" , "RequestData instanceof JSONObject");
+
                             JSONObject requestData = txnData.getJSONObject("RequestData");
 
                             Iterator<String> keys = requestData.keys();
                             while (keys.hasNext()) {
                                 String key = keys.next();
+                                Log.e("logGooglePay" , "key = " + key);
 
                                 if (requestData.get(key) instanceof JSONObject) {
                                     // Do nothing
+                                    Log.e("logGooglePay" , "key instanceof JSONObject");
                                 } else {
+                                    Log.e("logGooglePay" , "else");
                                     if (requestData.has("checkoutUrl")) {
+                                        Log.e("logGooglePay" , "has checkoutUrl");
 //                                        AppData.getInstance().setRedirectAppUrl(requestData.getString("checkoutUrl"));
                                     }
                                     html.append(String.format("<input type='hidden' name='%s' value='%s'>\n", key, requestData.getString(key)));
@@ -335,6 +385,8 @@ public class WebActivity extends AppCompatActivity {
 
                     html.append("</form>");
                     html.append("<script> document.getElementById('prForm').submit();</script>");
+
+                    Log.e("logGooglePay" , "html = " + html.toString());
 
                     onLoadHtmlWebView(html.toString());
                 } else {
@@ -352,6 +404,7 @@ public class WebActivity extends AppCompatActivity {
                 finish();
             }
         } catch (JSONException e) {
+            Log.e("logGooglePay" , "catch");
             e.printStackTrace();
         }
     }
