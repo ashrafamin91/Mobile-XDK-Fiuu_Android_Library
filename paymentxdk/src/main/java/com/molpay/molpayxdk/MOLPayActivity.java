@@ -564,7 +564,12 @@ public class MOLPayActivity extends AppCompatActivity {
                         paymentDetails.put(MOLPayActivity.mp_extended_vcode, Objects.requireNonNull(paymentDetails.get("mp_extended_vcode")));
                     }
 
-                    paymentDetails.put(MOLPayActivity.mp_sandbox_mode, Objects.requireNonNull(paymentDetails.get("mp_sandbox_mode"))); // Only set to false once you have request production access for your app
+                    if (paymentDetails.get("mp_sandbox_mode") == null) {
+                        paymentDetails.put(MOLPayActivity.mp_sandbox_mode, false);
+                    } else {
+                        paymentDetails.put(MOLPayActivity.mp_sandbox_mode, Objects.requireNonNull(paymentDetails.get("mp_sandbox_mode")));
+                    }
+
                     paymentDetails.put(MOLPayActivity.mp_merchant_ID, Objects.requireNonNull(paymentDetails.get("mp_merchant_ID"))); // Your sandbox / production merchant ID
                     paymentDetails.put(MOLPayActivity.mp_verification_key, Objects.requireNonNull(paymentDetails.get("mp_verification_key"))); // Your sandbox / production verification key
                     paymentDetails.put(MOLPayActivity.mp_amount, Objects.requireNonNull(paymentDetails.get("mp_amount"))); // Must be in 2 decimal points format
