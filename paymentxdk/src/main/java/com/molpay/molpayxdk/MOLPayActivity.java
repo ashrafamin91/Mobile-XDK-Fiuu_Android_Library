@@ -101,6 +101,7 @@ public class MOLPayActivity extends AppCompatActivity {
     public final static String mp_dpa_id = "mp_dpa_id";
     public final static String mp_company = "mp_company";
     public final static String mp_closebutton_display = "mp_closebutton_display";
+    public final static String mp_metadata = "mp_metadata";
 
     public final static String MOLPAY = "logMOLPAY";
     private final static String mpopenmolpaywindow = "mpopenmolpaywindow://";

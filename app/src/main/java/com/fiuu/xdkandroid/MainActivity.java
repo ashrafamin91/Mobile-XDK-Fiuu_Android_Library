@@ -96,6 +96,9 @@ public class MainActivity extends AppCompatActivity {
         // Optional, EN, MS, VI, TH, FIL, MY, KM, ID, ZH.
 //        paymentDetails.put(MOLPayActivity.mp_language, "MS");
 
+        // Add metadata in JSON String format e.g.
+//        paymentDetails.put(MOLPayActivity.mp_metadata, "{\"store_id\":\"MY2025HQ\"}");
+
         openStartActivityResult();
     }
 
