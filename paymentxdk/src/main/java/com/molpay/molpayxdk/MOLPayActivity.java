@@ -38,7 +38,9 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
 import com.molpay.molpayxdk.googlepay.ActivityGP;
+import com.molpay.molpayxdk.utils.DeviceInfoUtil;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -46,8 +48,21 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.security.MessageDigest;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Objects;
+import java.util.concurrent.Executors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 public class MOLPayActivity extends AppCompatActivity {
 
@@ -102,6 +117,7 @@ public class MOLPayActivity extends AppCompatActivity {
     public final static String mp_company = "mp_company";
     public final static String mp_closebutton_display = "mp_closebutton_display";
     public final static String mp_metadata = "mp_metadata";
+    public final static String device_info = "device_info";
 
     public final static String MOLPAY = "logMOLPAY";
     private final static String mpopenmolpaywindow = "mpopenmolpaywindow://";
@@ -124,6 +140,10 @@ public class MOLPayActivity extends AppCompatActivity {
     private Boolean isClosebuttonDisplay = false;
 
     private Boolean isTNGResult = false;
+    private String channel = "";
+    private static final Gson gson =  new Gson();
+    private static final OkHttpClient client = new OkHttpClient();
+    private static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
 
     // Private API
     private void closemolpay() {
@@ -132,6 +152,100 @@ public class MOLPayActivity extends AppCompatActivity {
             isClosingReceipt = false;
             finish();
         }
+    }
+
+    public static String generateSHA512(String input) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-512");
+            byte[] bytes = md.digest(input.getBytes("UTF-8"));
+            StringBuilder sb = new StringBuilder();
+            for (byte b : bytes) {
+                sb.append(String.format("%02x", b));
+            }
+            return sb.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static String sendXDKLogs(String reference, String type, String process, String details) {
+        try {
+
+            Log.d(MOLPAY, "try sendXDKLogs");
+
+            String urlString = "https://vtapi.merchant.razer.com/api/mobile/vt/logs";
+
+            String datetime = new SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault()).format(new Date());
+
+            String input = "4faf214e-172b-419f-9fc1-9b12744115eb" + datetime;
+            String checksum = generateSHA512(input);
+//            String checksum = Helper.getInstance().generateSHA512(PRODUCTION.APP_KEY + datetime);
+
+            Log.d(MOLPAY, "try 1");
+
+            // Build JSON body
+            JSONObject deviceInfo = new JSONObject()
+                    .put("platform", "Android")
+                    .put("os", Build.VERSION.RELEASE)
+                    .put("brand", Build.BRAND)
+                    .put("model", Build.MODEL)
+                    .put("modelNo", Build.DEVICE);
+
+            JSONObject productInfo = new JSONObject()
+                    .put("type", "XDK")
+                    .put("version", "latest")
+                    .put("merchantId", "chageesg_Dev");
+
+            JSONObject logs = new JSONObject()
+                    .put("referenceNumber", reference)
+                    .put("type", type)
+                    .put("process", process)
+                    .put("details", details);
+
+            JSONObject data = new JSONObject()
+                    .put("deviceInfo", deviceInfo)
+                    .put("productInfo", productInfo)
+                    .put("logs", logs);
+
+            JSONObject body = new JSONObject()
+                    .put("datetime", datetime)
+                    .put("checksum", checksum)
+                    .put("data", data);
+
+            Log.d(MOLPAY, "try 2");
+            Log.d(MOLPAY, "urlString = " + urlString);
+            Log.d(MOLPAY, "body = " + body.toString());
+
+            // Build request
+            RequestBody requestBody = RequestBody.create(body.toString(), JSON);
+            Request request = new Request.Builder()
+                    .url(urlString)
+                    .post(requestBody)
+                    .build();
+
+            Log.d(MOLPAY, "try 3");
+
+            // Send request
+            try (Response response = client.newCall(request).execute()) {
+
+                Log.d(MOLPAY, "try client.newCall");
+
+                if (response.isSuccessful()) {
+                    String responseStr = response.body().string();
+                    Log.d(MOLPAY, "returnMsg = " + responseStr);
+                    return responseStr;
+                } else {
+                    Log.e(MOLPAY, "Request failed: " + response.code());
+                }
+            }
+
+        } catch (Exception e) {
+            Log.d(MOLPAY, "catch Exception = " + e);
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
     @Override
@@ -198,6 +312,7 @@ public class MOLPayActivity extends AppCompatActivity {
                 paymentDetails.put(module_id, "molpay-mobile-xdk-android");
                 paymentDetails.put(wrapper_version, wrapperVersion);
             }
+            paymentDetails.put(device_info, gson.toJson(DeviceInfoUtil.getDeviceInfo(this)));
         }
 
         // Bind resources
@@ -322,6 +437,31 @@ public class MOLPayActivity extends AppCompatActivity {
         @Override
         public boolean shouldOverrideUrlLoading(final WebView view, String url) {
             //Log.d(MOLPAY, "MPMOLPayUIWebClient shouldOverrideUrlLoading url = " + url);
+
+            paymentDetails.put(MOLPayActivity.mp_merchant_ID, Objects.requireNonNull(paymentDetails.get("mp_merchant_ID"))); // Your sandbox / production merchant ID
+            paymentDetails.put(MOLPayActivity.mp_verification_key, Objects.requireNonNull(paymentDetails.get("mp_verification_key"))); // Your sandbox / production verification key
+            paymentDetails.put(MOLPayActivity.mp_app_name, Objects.requireNonNull(paymentDetails.get("mp_app_name")));
+            paymentDetails.put(MOLPayActivity.mp_username, Objects.requireNonNull(paymentDetails.get("mp_username")));
+            paymentDetails.put(MOLPayActivity.mp_password, Objects.requireNonNull(paymentDetails.get("mp_password")));
+
+            paymentDetails.put(MOLPayActivity.mp_amount, Objects.requireNonNull(paymentDetails.get("mp_amount"))); // Must be in 2 decimal points format
+            paymentDetails.put(MOLPayActivity.mp_order_ID, Objects.requireNonNull(paymentDetails.get("mp_order_ID"))); // Must be unique
+            paymentDetails.put(MOLPayActivity.mp_currency, Objects.requireNonNull(paymentDetails.get("mp_currency"))); // Must matched mp_country
+            paymentDetails.put(MOLPayActivity.mp_country, Objects.requireNonNull(paymentDetails.get("mp_country"))); // Must matched mp_currency
+            paymentDetails.put(MOLPayActivity.mp_bill_description, Objects.requireNonNull(paymentDetails.get("mp_bill_description")));
+            paymentDetails.put(MOLPayActivity.mp_bill_name, Objects.requireNonNull(paymentDetails.get("mp_bill_name")));
+            paymentDetails.put(MOLPayActivity.mp_bill_email, Objects.requireNonNull(paymentDetails.get("mp_bill_email")));
+            paymentDetails.put(MOLPayActivity.mp_bill_mobile, Objects.requireNonNull(paymentDetails.get("mp_bill_mobile")));
+
+            Gson gson = new Gson();
+            String paymentDetailsString = gson.toJson(paymentDetails);
+
+            // Call your logging method in a background thread
+            Executors.newSingleThreadExecutor().execute(() -> {
+                // sendXDKLogs(String reference, String type, String process, String details)
+                sendXDKLogs("paymentDetails = " + paymentDetailsString , "response MOLPayActivity.java" , "MPMOLPayUIWebClient shouldOverrideUrlLoading" , "url = " + url);
+            });
+
             if (url != null) {
                 if (url.contains("scbeasy/easy_app_link.html")) {
                     try {
@@ -438,6 +578,30 @@ public class MOLPayActivity extends AppCompatActivity {
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
             //Log.d(MOLPAY, "MPMainUIWebClient shouldOverrideUrlLoading url = " + url);
 
+            paymentDetails.put(MOLPayActivity.mp_merchant_ID, Objects.requireNonNull(paymentDetails.get("mp_merchant_ID"))); // Your sandbox / production merchant ID
+            paymentDetails.put(MOLPayActivity.mp_verification_key, Objects.requireNonNull(paymentDetails.get("mp_verification_key"))); // Your sandbox / production verification key
+            paymentDetails.put(MOLPayActivity.mp_app_name, Objects.requireNonNull(paymentDetails.get("mp_app_name")));
+            paymentDetails.put(MOLPayActivity.mp_username, Objects.requireNonNull(paymentDetails.get("mp_username")));
+            paymentDetails.put(MOLPayActivity.mp_password, Objects.requireNonNull(paymentDetails.get("mp_password")));
+
+            paymentDetails.put(MOLPayActivity.mp_amount, Objects.requireNonNull(paymentDetails.get("mp_amount"))); // Must be in 2 decimal points format
+            paymentDetails.put(MOLPayActivity.mp_order_ID, Objects.requireNonNull(paymentDetails.get("mp_order_ID"))); // Must be unique
+            paymentDetails.put(MOLPayActivity.mp_currency, Objects.requireNonNull(paymentDetails.get("mp_currency"))); // Must matched mp_country
+            paymentDetails.put(MOLPayActivity.mp_country, Objects.requireNonNull(paymentDetails.get("mp_country"))); // Must matched mp_currency
+            paymentDetails.put(MOLPayActivity.mp_bill_description, Objects.requireNonNull(paymentDetails.get("mp_bill_description")));
+            paymentDetails.put(MOLPayActivity.mp_bill_name, Objects.requireNonNull(paymentDetails.get("mp_bill_name")));
+            paymentDetails.put(MOLPayActivity.mp_bill_email, Objects.requireNonNull(paymentDetails.get("mp_bill_email")));
+            paymentDetails.put(MOLPayActivity.mp_bill_mobile, Objects.requireNonNull(paymentDetails.get("mp_bill_mobile")));
+
+            Gson gson = new Gson();
+            String paymentDetailsString = gson.toJson(paymentDetails);
+
+            // Call your logging method in a background thread
+            Executors.newSingleThreadExecutor().execute(() -> {
+                // sendXDKLogs(String reference, String type, String process, String details)
+                sendXDKLogs("paymentDetails = " + paymentDetailsString , "response MOLPayActivity.java" , "MPMainUIWebClient shouldOverrideUrlLoading" , "url = " + url);
+            });
+
             if (url != null) {
                 if (url.startsWith(mpopenmolpaywindow)) {
                     String base64String = url.replace(mpopenmolpaywindow, "");
@@ -447,6 +611,15 @@ public class MOLPayActivity extends AppCompatActivity {
                     byte[] data = Base64.decode(base64String, Base64.DEFAULT);
                     String dataString = new String(data);
                     //Log.d(MOLPAY, "MPMainUIWebClient mpopenmolpaywindow dataString = " + dataString);
+
+                    Pattern pattern = Pattern.compile("name=\"payment_gateway\"\\s+value=\"([^\"]+)\"");
+                    Matcher matcher = pattern.matcher(dataString);
+
+                    if (matcher.find()) {
+                        String value = matcher.group(1);
+                        Log.d(MOLPAY, "payment_gateway value = " + value);
+                        channel = value;
+                    }
 
                     if (!dataString.isEmpty()) {
                         //Log.d(MOLPAY, "MPMainUIWebClient mpopenmolpaywindow success");
@@ -471,7 +644,11 @@ public class MOLPayActivity extends AppCompatActivity {
                         mpBankUI.destroy();
                         mpBankUI = null;
                     }
-                    if (mpMOLPayUI != null) {
+
+                    Log.d(MOLPAY, "if channel = " + channel);
+
+                    if (mpMOLPayUI != null && !channel.equalsIgnoreCase("PayNow")) {
+                        Log.d(MOLPAY, "Close mpMOLPayUI");
                         mpMOLPayUI.loadUrl("about:blank");
                         mpMOLPayUI.setVisibility(View.GONE);
                         mpMOLPayUI.clearCache(true);
@@ -479,6 +656,8 @@ public class MOLPayActivity extends AppCompatActivity {
                         mpMOLPayUI.removeAllViews();
                         mpMOLPayUI.destroy();
                         mpMOLPayUI = null;
+                    } else {
+                        Log.d(MOLPAY, "Not Close mpMOLPayUI");
                     }
                 } else if (url.startsWith(mptransactionresults)) {
                     String base64String = url.replace(mptransactionresults, "");
