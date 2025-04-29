@@ -39,6 +39,8 @@ dependencies {
     implementation "com.google.android.gms:play-services-pay:16.5.0"
     implementation "com.google.android.gms:play-services-wallet:19.4.0"
     implementation 'org.apache.commons:commons-lang3:3.4'
+    implementation 'com.google.code.gson:gson:2.11.0'
+    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
 }
 
 afterEvaluate {
@@ -48,7 +50,7 @@ afterEvaluate {
                 from components.release
                 groupId = 'com.github.FiuuPayment'
                 artifactId = 'Mobile-XDK-Fiuu_Android_Library'
-                version = '3.34.14'
+                version = '3.34.15-beta'
             }
         }
     }
