@@ -54,7 +54,7 @@ afterEvaluate {
         publications {
             release(MavenPublication) {
                 from components.release
-                groupId = 'com.github.FiuuPayment'
+                groupId = 'com.github.ashrafamin91'
                 artifactId = 'Mobile-XDK-Fiuu_Android_Library'
                 version = '3.34.15'
             }
